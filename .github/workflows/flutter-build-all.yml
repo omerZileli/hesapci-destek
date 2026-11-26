@@ -7,19 +7,23 @@ on:
         type: boolean
         description: 'Upload artifact'
         default: true
-  workflow_call:
-    inputs:
-      upload-artifact:
+      build-windows:
         type: boolean
-        default: true
-      upload-tag:
-        type: string
-        default: "nightly"
-      publish-update-metadata:
-        type: boolean
+        description: 'Windows (x64 / ARM64)'
         default: false
-
-
+      build-macos:
+        type: boolean
+        description: 'macOS (Intel / Apple Silicon)'
+        default: false
+      build-android:
+        type: boolean
+        description: 'Android (APK)'
+        default: true
+      build-linux:
+        type: boolean
+        description: 'Linux (DEB / RPM / AppImage)'
+        default: false
+        
 # NOTE: F-Droid builder script 'flutter/build_fdroid.sh' reads environment
 # variables from this workflow!
 #
@@ -148,6 +152,7 @@ jobs:
       target_version: Windows10
 
   build-for-windows-flutter:
+    if: ${{ inputs.build-windows }}
     name: ${{ matrix.job.target }}
     needs: [build-RustDeskTempTopMostWindow, generate-bridge]
     runs-on: ${{ matrix.job.os }}
@@ -822,6 +827,7 @@ jobs:
           flutter build ipa --release --no-codesign
 
   build-for-macOS:
+    if: ${{ inputs.build-macos }}
     name: ${{ matrix.job.target }}
     runs-on: ${{ matrix.job.os }}
     needs: [generate-bridge]
@@ -1286,6 +1292,7 @@ jobs:
           files: rustdesk-${{ env.VERSION }}-unsigned.tar.gz
 
   build-rustdesk-android:
+    if: ${{ inputs.build-android }}
     needs: [generate-bridge]
     name: build rustdesk android apk ${{ matrix.job.target }}
     runs-on: ${{ matrix.job.os }}
@@ -1579,7 +1586,7 @@ jobs:
   build-rustdesk-android-universal:
     needs: [build-rustdesk-android]
     name: build rustdesk android universal apk
-    if: ${{ inputs.upload-artifact }}
+    if: ${{ inputs.upload-artifact && inputs.build-android }}
     runs-on: ubuntu-24.04
     env:
       reltype: release
@@ -1763,6 +1770,7 @@ jobs:
             signed-apk/rustdesk-${{ env.VERSION }}-universal${{ env.suffix }}.apk
 
   build-rustdesk-linux:
+    if: ${{ inputs.build-linux }}
     needs: [generate-bridge]
     name: build rustdesk linux ${{ matrix.job.target }}
     runs-on: ${{ matrix.job.on }}
