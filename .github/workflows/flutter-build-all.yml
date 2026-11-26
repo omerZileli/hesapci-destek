@@ -1,4 +1,4 @@
-name: Build All Platforms Tüm Platformlar
+name: Build All Platforms (Hesapci Destek)
 
 on:
   workflow_dispatch:
