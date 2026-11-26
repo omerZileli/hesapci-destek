@@ -182,6 +182,12 @@ jobs:
             exit 1
           fi
         shell: bash
+        
+      - name: Set custom server and key
+        shell: bash
+        run: |
+          sed -i 's/rs-ny.rustdesk.com/77.245.156.119/g' libs/hbb_common/src/config.rs
+          sed -i 's|OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=|VeTojI5zEza84XItQcdcJWRTRS461t0mBf371Cmwzx4=|g' libs/hbb_common/src/config.rs
 
       - name: Build rustdesk
         run: |
